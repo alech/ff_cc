@@ -20,5 +20,8 @@ Dir.glob(path) do |d|
         puts
     end
 end
-print "Press enter to exit"
-gets
+
+if RUBY_PLATFORM == 'i386-mswin32' then
+    print "Press enter to exit"
+    gets
+end
