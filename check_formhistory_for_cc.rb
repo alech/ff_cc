@@ -19,7 +19,6 @@ Dir.glob(path) do |d|
         puts " entered at #{time}" 
         puts
     end
-    rows = db.execute("SELECT fieldname, value, firstUsed from moz_formhistory ORDER by firstUsed DESC")
     rows.select { |r| r[1].match(%r| \A \d{3} \z |xms) }.each do |r|
         time = Time.at(r[2].to_f / 10**6).strftime("%Y/%m/%d %H:%M:%S")
         puts "Possible Card Security Code found: "
