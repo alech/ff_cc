@@ -11,12 +11,16 @@ def open_websites_at(time, d)
     time_start = (time.to_i - MIN_START*60) * 10**6 # MIN_START minutes before
     time_end   = (time.to_i +   MIN_END*60) * 10**6 # MIN_END   minutes after
     places_file = d.sub('formhistory.sqlite', 'places.sqlite')
-    places_db = SQLite3::Database.new(places_file)
-    query = "SELECT url, title from moz_places where last_visit_date > #{time_start} AND last_visit_date < #{time_end}"
-    places_rows = places_db.execute(query)
-    puts " Open websites at about that time:"
-    places_rows.each do |r|
-        puts "   #{r[1]} - #{r[0]}"
+    begin
+        places_db = SQLite3::Database.new(places_file)
+        query = "SELECT url, title from moz_places where last_visit_date > #{time_start} AND last_visit_date < #{time_end}"
+        places_rows = places_db.execute(query)
+        puts " Open websites at about that time:"
+        places_rows.each do |r|
+            puts "   #{r[1]} - #{r[0]}"
+        end
+    rescue SQLite3::BusyException
+        STDERR.puts " WARNING: Can not show open websites because Firefox is running."
     end
 end
 
