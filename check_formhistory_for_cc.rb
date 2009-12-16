@@ -24,6 +24,19 @@ def open_websites_at(time, d)
     end
 end
 
+def possible_cscs_at(time, db)
+    time_start = (time.to_i - MIN_START*60) * 10**6 # MIN_START minutes before
+    time_end   = (time.to_i +   MIN_END*60) * 10**6 # MIN_END   minutes after
+    query = "SELECT fieldname, value, firstUsed, lastUsed from moz_formhistory where lastUsed > #{time_start} AND lastUsed < #{time_end}"
+    db.execute(query).select { |r| r[1].match(%r| \A \d{3} \z |xms) }.each do |r|
+        time = Time.at(r[2].to_f / 10**6).strftime("%Y/%m/%d %H:%M:%S")
+        puts "Possible Card Security Code found: "
+        puts " #{r[1]}"
+        puts " in form field #{r[0]}"
+        puts " entered at #{time}" 
+        puts
+    end
+end
 path = File.expand_path("~")
 path = path + (RUBY_PLATFORM == 'i386-mswin32' ? '/Anwendungsdaten/Mozilla/Firefox/Profiles/' : '/.mozilla/firefox/')
 
@@ -38,19 +51,12 @@ Dir.glob(path + '*/formhistory.sqlite') do |d|
         puts " #{r[1].creditcard_type.capitalize} #{r[1]}"
         puts " in form field #{r[0]}"
         puts " first entered at #{time.strftime("%Y/%m/%d %H:%M:%S")}" 
+        possible_cscs_at(time, db)
         open_websites_at(time, d)
         if time_last != time then
             puts " last entered at #{time_last.strftime("%Y/%m/%d %H:%M:%S")}"
             open_websites_at(time_last, d)
         end
-        puts
-    end
-    rows.select { |r| r[1].match(%r| \A \d{3} \z |xms) }.each do |r|
-        time = Time.at(r[2].to_f / 10**6).strftime("%Y/%m/%d %H:%M:%S")
-        puts "Possible Card Security Code found: "
-        puts " #{r[1]}"
-        puts " in form field #{r[0]}"
-        puts " entered at #{time}" 
         puts
     end
 end
