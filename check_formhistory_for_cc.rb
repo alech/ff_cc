@@ -1,5 +1,11 @@
 #!/usr/bin/env ruby
 
+# To use:
+# sudo gem install sqlite-ruby
+# sudo gem install creditcard
+# Quit Firefox
+# run check_formhistory_for_cc.rb
+
 require 'rubygems'
 require 'sqlite3'
 require 'creditcard'
